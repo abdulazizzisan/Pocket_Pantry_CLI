@@ -13,8 +13,8 @@ pub enum Command {
 }
 
 impl Command {
-    fn get(ordinal: i8) -> Self {
-        match ordinal {
+    fn from_ordinal(i: i8) -> Self {
+        match i {
             0 => Quit,
             1 => Add,
             2 => View,
@@ -70,6 +70,6 @@ impl Command {
                 return Err(());
             }
         };
-        Ok(Self::get(input))
+        Ok(Self::from_ordinal(input))
     }
 }

@@ -1,5 +1,5 @@
-mod pantry;
 mod menu;
+mod pantry;
 
 use crate::menu::Command;
 
@@ -8,7 +8,7 @@ fn main() {
     loop {
         let usr_cmd = match Command::read_menu() {
             Ok(cmd) => cmd,
-            Err(_) => continue
+            Err(_) => continue,
         };
     }
 }
