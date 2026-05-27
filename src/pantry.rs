@@ -1,15 +1,18 @@
+use std::io::{stdin};
+
 use crate::pantry::Category::{Fruit, Grain, Other, Protein, Snack, Vegetable};
 use crate::pantry::StockStatus::{InStock, LowStock, OutOfStock};
 
-struct PantryItem {
-    name: String,
+#[derive(Debug)]
+pub struct PantryItem {
+    pub name: String,
     quantity: u32,
     category: Category,
     status: StockStatus,
 }
 
 impl PantryItem {
-    fn new(name: String, quantity: u32, category: Category) -> Result<Self, String> {
+    fn new(name: String, quantity: u32, category: Category) -> Self {
         let obj = Self {
             name,
             quantity,
@@ -17,9 +20,64 @@ impl PantryItem {
             status: StockStatus::from_quantity(quantity),
         };
 
-        Err("".to_string())
+        obj
+    }
+
+    pub fn from_user() -> Self {
+        let mut name = String::new();
+        let mut quantity = String::new();
+        let mut category = String::new();
+
+        // take name input
+        println!("Enter item name: ");
+        stdin().read_line(&mut name).expect("Error reading name.");
+        let name = name.trim().to_string();
+
+        // take quantity input
+        println!("Enter quantity(Number only):");
+        stdin()
+            .read_line(&mut quantity)
+            .expect("Error reading quantity.");
+        let quantity: u32 = match quantity.trim().parse() {
+            Ok(val) => val,
+            Err(_) => 0,
+        };
+
+        // take category input
+        println!("Select a category:");
+        println!("{}", Category::string_label());
+        stdin()
+            .read_line(&mut category)
+            .expect("Error reading category");
+        let category = category
+            .trim()
+            .parse::<i8>()
+            .expect("please enter valid number.");
+        let category: Category = match category {
+            0..=4 => Category::from_ordinal(category).unwrap(),
+            5 => {
+                println!("Please enter short desc of the category:");
+                let mut desc = String::new();
+                stdin().read_line(&mut desc).expect("IO err while reading ");
+                Category::other(desc.trim().to_string())
+            }
+            _ => panic!("Invalid index for category."),
+        };
+
+        Self::new(name, quantity, category)
+    }
+
+    pub fn set_quantity(&mut self, quantity: u32) {
+        self.quantity = quantity + self.quantity;
+    }
+
+    pub fn get_quantity(&self) -> u32 {
+        self.quantity
     }
 }
+
+
+#[derive(Debug)]
 enum StockStatus {
     InStock,
     LowStock,
@@ -36,6 +94,7 @@ impl StockStatus {
     }
 }
 
+#[derive(Debug)]
 enum Category {
     Grain,
     Protein,
@@ -46,6 +105,17 @@ enum Category {
 }
 
 impl Category {
+    fn string_label() -> String {
+        "
+            0. Grain,
+            1. Protein,
+            2. Vegetable,
+            3. Fruit,
+            4. Snack,
+            5. Other
+            "
+        .to_string()
+    }
     fn from_ordinal(i: i8) -> Result<Self, String> {
         match i {
             0 => Ok(Grain),
@@ -57,7 +127,7 @@ impl Category {
         }
     }
 
-    fn other(desc: String) -> Self{
+    fn other(desc: String) -> Self {
         Other(desc)
     }
 }

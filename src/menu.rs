@@ -1,4 +1,5 @@
 use crate::menu::Command::*;
+use crate::pantry::PantryItem;
 use std::io::{Write, stdin, stdout};
 
 pub enum Command {
@@ -10,6 +11,36 @@ pub enum Command {
     Summary,
     Quit,
     Invalid,
+}
+
+impl Command {
+    pub fn execute(&self, item_vector: &mut Vec<PantryItem>) {
+        match self {
+            Add => {
+                let mut item = PantryItem::from_user();
+                for itm in item_vector.iter() {
+                    if itm.name == item.name {
+                        println!(
+                            "An item already exists with same name. Incrementing the quantity."
+                        );
+                        item.set_quantity(item.get_quantity());
+                        println!("Item updated successfully.");
+                        return;
+                    }
+                }
+                item_vector.push(item);
+                println!("Item added successfully.");
+            }
+            View => {
+            }
+            Search => {}
+            Update => {}
+            Remove => {}
+            Summary => {}
+            Quit => {}
+            Invalid => {}
+        }
+    }
 }
 
 impl Command {
